@@ -366,7 +366,7 @@ This allows developers to test the payment workflow without sending real money.
 
 ---
 
-# 🔌 API
+# API
 
 Base URL:
 
@@ -504,7 +504,7 @@ Financial state transitions should be performed **server-side**, never trusted f
 
 ---
 
-# ⚖️ Compliance & Production Readiness
+#  Compliance & Production Readiness
 
 SafeKazi is currently an MVP/prototype.
 
