@@ -1,4 +1,4 @@
-# SafeKazi 🔒
+# SafeKazi
 
 > **M-Pesa Micro-Escrow Platform for African Freelancers & SME Clients**
 
@@ -12,7 +12,7 @@ Freelancers can create a project, define its scope and price, generate a shareab
 
 ---
 
-## 🎯 The Problem
+##  The Problem
 
 Freelancers and SMEs in local markets often rely on informal payment arrangements.
 
@@ -51,7 +51,7 @@ Direct M-Pesa transfers solve the payment-transfer problem but do not, by themse
 
 ---
 
-# 💡 The SafeKazi Solution
+#  The SafeKazi Solution
 
 SafeKazi acts as a **payment coordination layer between a freelancer and their client**.
 
@@ -110,9 +110,9 @@ Freelancer payout
 
 ---
 
-# ✨ Core Features
+#  Core Features
 
-## 🔗 Instant Payment Links
+##  Instant Payment Links
 
 Freelancers can create lightweight project links containing information such as:
 
@@ -134,7 +134,7 @@ No marketplace profile is required for the client.
 
 ---
 
-## 📱 M-Pesa Integration
+##  M-Pesa Integration
 
 SafeKazi is designed around the **Safaricom Daraja API**.
 
@@ -164,7 +164,7 @@ After the project reaches the appropriate release state, the system can initiate
 
 ---
 
-## 📊 Real-Time Project Status
+##  Real-Time Project Status
 
 Projects use explicit financial states rather than relying on informal communication.
 
@@ -180,7 +180,7 @@ This state machine provides a clear representation of the project's financial wo
 
 ---
 
-# 💰 Transaction Fee
+#  Transaction Fee
 
 SafeKazi's proposed MVP pricing model uses a:
 
@@ -198,7 +198,7 @@ The final commercial and regulatory treatment of this fee must be validated befo
 
 ---
 
-# ⚠️ Dispute Protection
+#  Dispute Protection
 
 If a client marks a project as non-compliant with the agreed scope, the project can enter:
 
@@ -222,7 +222,7 @@ Future versions can introduce a formal dispute-resolution workflow involving evi
 
 ---
 
-# 🏗️ System Architecture
+#  System Architecture
 
 ```text
                                   ┌─────────────────────────┐
@@ -257,7 +257,7 @@ Future versions can introduce a formal dispute-resolution workflow involving evi
 
 ---
 
-# 🛠️ Technology Stack
+#  Technology Stack
 
 ## Frontend
 
@@ -295,95 +295,7 @@ Future versions can introduce a formal dispute-resolution workflow involving evi
 
 ---
 
-# 🗄️ Database Schema
-
-SafeKazi uses three primary entities:
-
-```text
-Users
-  │
-  │ 1:N
-  ▼
-Projects
-  │
-  │ 1:N
-  ▼
-Transactions
-```
-
-## Users
-
-Stores freelancer account information.
-
-```sql
-CREATE TABLE users (
-    id SERIAL PRIMARY KEY,
-    full_name VARCHAR(100) NOT NULL,
-    email VARCHAR(150) UNIQUE NOT NULL,
-    phone_number VARCHAR(15) NOT NULL,
-    password_hash VARCHAR(255) NOT NULL,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-);
-```
-
-## Projects
-
-Stores the project agreement and current project state.
-
-```sql
-CREATE TYPE project_status AS ENUM (
-    'pending',
-    'locked',
-    'released',
-    'disputed',
-    'cancelled'
-);
-
-CREATE TABLE projects (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id INT REFERENCES users(id) ON DELETE CASCADE,
-    title VARCHAR(200) NOT NULL,
-    description TEXT,
-    amount NUMERIC(10, 2) NOT NULL CHECK (amount > 0),
-    client_phone VARCHAR(15) NOT NULL,
-    status project_status DEFAULT 'pending',
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-);
-```
-
-## Transactions
-
-Records deposits, payouts, and refunds associated with projects.
-
-```sql
-CREATE TYPE transaction_type AS ENUM (
-    'deposit',
-    'payout',
-    'refund'
-);
-
-CREATE TYPE transaction_status AS ENUM (
-    'pending',
-    'completed',
-    'failed'
-);
-
-CREATE TABLE transactions (
-    id SERIAL PRIMARY KEY,
-    project_id UUID REFERENCES projects(id) ON DELETE CASCADE,
-    amount NUMERIC(10, 2) NOT NULL,
-    type transaction_type NOT NULL,
-    mpesa_receipt VARCHAR(50),
-    checkout_request_id VARCHAR(100),
-    status transaction_status DEFAULT 'pending',
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-);
-```
-
----
-
-# 📁 Project Structure
+#  Project Structure
 
 ```text
 safekazi/
@@ -416,171 +328,7 @@ safekazi/
 
 ---
 
-# ⚙️ Environment Configuration
-
-Create a `.env` file inside the `server` directory.
-
-```env
-# Server Configuration
-PORT=5000
-NODE_ENV=development
-
-# Database Configuration
-DB_HOST=localhost
-DB_PORT=5432
-DB_USER=safekazi_admin
-DB_PASSWORD=your_secure_password
-DB_NAME=safekazi_db
-
-# Authentication
-JWT_SECRET=your_jwt_secret_key_here
-JWT_EXPIRES_IN=7d
-
-# Safaricom Daraja
-DARAJA_CONSUMER_KEY=your_consumer_key
-DARAJA_CONSUMER_SECRET=your_consumer_secret
-DARAJA_BUSINESS_SHORTCODE=174379
-DARAJA_PASSKEY=your_passkey
-DARAJA_CALLBACK_URL=https://your-domain.com/api/v1/payments/callback
-
-# Development Payment Mode
-USE_MOCK_DARAJA=true
-```
-
-### Security
-
-**Never commit `.env` to Git.**
-
-Add the following to `.gitignore`:
-
-```gitignore
-.env
-.env.local
-.env.production
-```
-
----
-
-# 🚀 Getting Started
-
-## Prerequisites
-
-Make sure you have:
-
-* Node.js `18+`
-* PostgreSQL `14+`
-* npm or Yarn
-* Git
-
----
-
-## 1. Clone the Repository
-
-```bash
-git clone https://github.com/your-username/safekazi.git
-
-cd safekazi
-```
-
----
-
-## 2. Install Server Dependencies
-
-```bash
-cd server
-
-npm install
-```
-
----
-
-## 3. Install Client Dependencies
-
-```bash
-cd ../client
-
-npm install
-```
-
----
-
-## 4. Configure PostgreSQL
-
-Create the database:
-
-```bash
-psql -U postgres -c "CREATE DATABASE safekazi_db;"
-```
-
-Run the schema:
-
-```bash
-psql -U postgres -d safekazi_db -f ../database/schema.sql
-```
-
----
-
-## 5. Configure Environment Variables
-
-Inside `server/`:
-
-```bash
-cp .env.example .env
-```
-
-Then configure the required values.
-
-For local development, keep:
-
-```env
-USE_MOCK_DARAJA=true
-```
-
----
-
-# ▶️ Running the Application
-
-## Start the Backend
-
-From:
-
-```text
-safekazi/server/
-```
-
-run:
-
-```bash
-npm run dev
-```
-
-Backend:
-
-```text
-http://localhost:5000
-```
-
----
-
-## Start the Frontend
-
-Open another terminal:
-
-```bash
-cd safekazi/client
-
-npm start
-```
-
-Frontend:
-
-```text
-http://localhost:3000
-```
-
----
-
-# 🧪 Mock Daraja Service
+#  Mock Daraja Service
 
 SafeKazi includes a mock Daraja service so development does not depend on live Safaricom payment infrastructure.
 
@@ -650,7 +398,7 @@ Base URL:
 
 ---
 
-# 🔄 Core User Journey
+#  Core User Journey
 
 ### 1. Freelancer Creates Project
 
@@ -731,7 +479,7 @@ The automatic payout workflow should stop until the dispute is resolved.
 
 ---
 
-# 🔐 Security Considerations
+#  Security Considerations
 
 Because SafeKazi handles authentication and payment-related information, security is a core requirement.
 
@@ -778,140 +526,13 @@ The application should not be presented as a regulated escrow service until the 
 
 ---
 
-# 🗺️ Development Roadmap
-
-## ✅ Phase 1 — Problem Discovery & Validation
-
-* [x] Define core problem
-* [x] Define target users
-* [x] Develop initial product concept
-* [x] Landing page / waitlist
-* [x] Local community validation
-
-## ✅ Phase 2 — MVP Architecture
-
-* [x] Define system architecture
-* [x] Design database schema
-* [x] Define project state machine
-* [x] Define transaction states
-* [x] Define REST API structure
-* [x] Define Daraja integration architecture
-
-## 🚧 Phase 3 — Sandbox & Mock Daraja
-
-* [ ] Implement authentication
-* [ ] Implement project creation
-* [ ] Implement payment-link generation
-* [ ] Implement mock STK Push
-* [ ] Implement mock callback
-* [ ] Implement transaction recording
-* [ ] Implement project state transitions
-* [ ] Implement simulated B2C payout
-* [ ] Add payment idempotency
-
-## 🔜 Phase 4 — Closed Beta
-
-Target:
-
-> **10 local freelancers in Nakuru/Nairobi**
-
-Testing areas:
-
-* Project creation
-* Payment links
-* Client experience
-* M-Pesa workflow
-* Project approval
-* Dispute workflow
-* Payment status accuracy
-* User experience
-* Failure scenarios
-
-## 🔜 Phase 5 — Production Readiness
-
-* [ ] Security audit
-* [ ] Payment reconciliation
-* [ ] Error monitoring
-* [ ] Production infrastructure
-* [ ] Daraja production onboarding
-* [ ] Compliance review
-* [ ] Terms of service
-* [ ] Privacy policy
-* [ ] Formal dispute-resolution process
-* [ ] Production payment testing
-
----
-
-# 📈 Future Possibilities
-
-Potential future capabilities include:
-
-* Milestone-based projects
-* Multiple payment milestones
-* Automated invoices
-* Payment receipts
-* Client accounts
-* Freelancer profiles
-* Project evidence uploads
-* Automated reminders
-* Payment history
-* Transaction analytics
-* Webhooks
-* Email/SMS notifications
-* WhatsApp notifications
-* Advanced dispute management
-* Business verification
-* Reputation/trust indicators
-* API access for third-party platforms
-
-These features are outside the current MVP scope and may be introduced as the product evolves.
-
----
-
-# 🤝 Contributing
+#  Contributing
 
 Contributions are welcome as the project develops.
 
-### 1. Fork the repository
-
-```bash
-git fork https://github.com/your-username/safekazi.git
-```
-
-### 2. Create a feature branch
-
-```bash
-git checkout -b feature/your-feature
-```
-
-### 3. Make your changes
-
-Test your changes locally before committing.
-
-### 4. Commit
-
-```bash
-git commit -m "Add your feature"
-```
-
-### 5. Push
-
-```bash
-git push origin feature/your-feature
-```
-
-### 6. Open a Pull Request
-
-Explain:
-
-* What changed
-* Why it changed
-* How it was tested
-* Any limitations or known issues
-
 ---
 
-# 📄 License
+#  License
 
 This project is currently under development.
 
@@ -919,7 +540,7 @@ A formal open-source or proprietary license should be selected before public dis
 
 ---
 
-# 👨‍💻 Project
+#  Project
 
 **SafeKazi**
 
@@ -929,7 +550,7 @@ Built as a localized financial utility for freelancers and SMEs operating in M-P
 
 ---
 
-## ⚠️ Disclaimer
+##  Disclaimer
 
 SafeKazi is an experimental software project and MVP concept.
 
